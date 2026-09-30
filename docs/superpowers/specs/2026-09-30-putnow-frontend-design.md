@@ -226,12 +226,13 @@ On mobile, tables retain only priority columns and expose full row details throu
 - `GET /api/v1/auth/me` returns `id`, `name`, `email`, `phone`, and `role`.
 - A single login page handles both roles.
 - Successful login redirects `USER` to the customer area and `ADMIN` to `/admin`.
+- Every successful refresh rotates the refresh token, revokes the previous token, and replaces the refresh cookie.
 
 ### 8.2 Refresh coordination
 
 - When an authenticated request receives `401`, the API client starts one refresh request.
 - Concurrent requests reuse the same in-flight refresh operation rather than producing multiple refresh calls.
-- After a successful refresh, each failed request is retried once.
+- A successful refresh revokes the previous refresh token, stores a new refresh token, replaces both authentication cookies as needed, and retries each failed request once.
 - A failed refresh clears authenticated query data and redirects the user to login.
 - Refresh loops are forbidden.
 
@@ -354,7 +355,7 @@ The frontend depends on the following approved backend changes.
 ### 11.2 Cookie authentication
 
 - Login sets access and refresh cookies.
-- Refresh reads the refresh cookie and rotates or replaces tokens as implemented by the backend policy.
+- Refresh reads the refresh cookie, validates its stored revocation state, revokes it, issues and stores a new refresh token, and replaces the cookies.
 - Logout invalidates stored tokens and clears cookies.
 - Protected API authentication reads the access cookie.
 - CSRF protection is enabled for state-changing cookie-authenticated requests.
@@ -393,6 +394,14 @@ The frontend depends on the following approved backend changes.
 - Validate status names and legal transitions on the backend.
 - Preserve automatic pending expiration.
 - Preserve inventory restoration when a booking reaches `CANCELLED` or `EXPIRED` through a legal transition.
+
+### 11.8 Sensitive authentication configuration
+
+- Remove hard-coded JWT secrets from committed configuration.
+- Read access, refresh, and reset-token secrets from environment variables.
+- Provide documented local environment-variable names without committing secret values.
+- Remove logging of authorization headers, access tokens, refresh tokens, reset tokens, cookies, and other credentials.
+- Retain only non-sensitive authentication audit context.
 
 ## 12. Error handling
 
@@ -450,7 +459,7 @@ Use Playwright for:
 - Public and protected concert endpoint authorization
 - Admin-only user management
 - HttpOnly login cookies
-- Refresh and logout cookie behavior
+- Refresh-token rotation, old-token revocation, and logout cookie behavior
 - CSRF enforcement
 - `/auth/me` identity and role
 - Authenticated password change with current-password verification and all-session token revocation
@@ -510,4 +519,5 @@ Use Playwright for:
 - Light and dark themes remain readable.
 - Every primary screen handles loading, empty, and error states.
 - Cookie authentication, CORS, and CSRF work between ports 3000 and 8080.
+- No authentication secrets or complete tokens are committed or written to application logs.
 - README documents local environment variables and startup steps for both repositories.
