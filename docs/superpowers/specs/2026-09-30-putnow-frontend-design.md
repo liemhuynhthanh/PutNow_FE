@@ -245,6 +245,14 @@ On mobile, tables retain only priority columns and expose full row details throu
 - Spring Security remains responsible for authentication, CSRF enforcement, and role authorization.
 - Frontend route guards improve navigation and presentation but are not treated as a security boundary.
 
+### 8.4 SMTP password recovery
+
+- Spring Boot sends reset links through a configurable SMTP server; the frontend never receives SMTP credentials.
+- Local development defaults to an SMTP catcher on `localhost:1025`; production supplies its provider settings through environment secrets.
+- Reset links target `${FRONTEND_BASE_URL}/reset-password?token=...`.
+- Forgot-password responses do not reveal whether an email address exists.
+- `.env.example` documents SMTP names only, while `.env` and all real credentials remain ignored by Git.
+
 ## 9. TanStack Query behavior
 
 - Query keys are created through typed factories for auth, concerts, ticket types, bookings, users, vouchers, and availability.

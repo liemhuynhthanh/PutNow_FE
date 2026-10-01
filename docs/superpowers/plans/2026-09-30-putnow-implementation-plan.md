@@ -101,6 +101,10 @@ Expected at this stage: existing tests pass and new target-behavior tests fail f
 - Add `src/main/java/com/huynhliem/service/AuthCookieService.java`
 - Add `src/main/java/com/huynhliem/dto/request/AuthenticatedPasswordChangeRequest.java`
 - Add `src/main/java/com/huynhliem/dto/response/CurrentUserResponse.java`
+- Add `src/main/java/com/huynhliem/service/EmailService.java`
+- Add `src/main/java/com/huynhliem/service/impl/SmtpEmailService.java`
+- Add `src/main/java/com/huynhliem/config/MailConfig.java`
+- Add SMTP variable names to `.env.example`
 - Update authentication tests from Task 1
 
 ### Steps
@@ -121,6 +125,7 @@ Expected at this stage: existing tests pass and new target-behavior tests fail f
 8. Verify `currentPassword`, password confirmation, and password policy.
 9. On success, encode the new password, revoke all stored tokens, clear current cookies, and require login again.
 10. Keep the existing reset-token password flow separate.
+11. Send forgot-password links through SMTP, return a generic response for unknown email addresses, and keep provider credentials in environment variables only.
 
 ### Verification
 
